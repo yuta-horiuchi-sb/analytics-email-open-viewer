@@ -21,13 +21,13 @@ import {
 } from "./types";
 
 /**
- * A reusable, authenticated wrapper for the native `fetch` function.
+ * A reusable wrapper for the native `fetch` function.
+ * This version relies on the existing browser session for authentication.
  */
-const authenticatedFetch = async (url: string, apiKey: string) => {
+const authenticatedFetch = async (url: string) => {
   const response = await fetch(url, {
     method: "GET",
     headers: {
-      Authorization: `Basic ${apiKey.trim()}`,
       "Content-Type": "application/json",
     },
   });
@@ -45,14 +45,12 @@ const authenticatedFetch = async (url: string, apiKey: string) => {
  * Fetches and parses the newline-delimited JSON stream of email interaction events.
  */
 const fetchAndParseEmailEvents = async (
-  apiKey: string,
   domain: string,
   emailId: string,
   since: string,
   until: string,
 ): Promise<EmailEvent[]> => {
   if (
-    !apiKey ||
     !emailId ||
     emailId === "undefined" ||
     emailId === "dummy" ||
@@ -62,7 +60,7 @@ const fetchAndParseEmailEvents = async (
 
   const baseUrl = `https://${domain}`;
   const url = `${baseUrl}/api/email-performance/${emailId}/events?since=${since}&until=${until}`;
-  const response = await authenticatedFetch(url, apiKey);
+  const response = await authenticatedFetch(url);
   const textData = await response.text();
 
   return textData
@@ -73,34 +71,26 @@ const fetchAndParseEmailEvents = async (
 
 const userProfileCache = new Map<string, UserProfile>();
 
-/**
- * Fetches a user's public profile information, utilizing an in-memory cache to avoid redundant requests.
- */
 const fetchUserProfile = async (
-  apiKey: string,
   domain: string,
   userId: string,
 ): Promise<UserProfile> => {
   if (userProfileCache.has(userId)) return userProfileCache.get(userId)!;
   const baseUrl = `https://${domain}`;
   const url = `${baseUrl}/api/profiles/public/${userId}`;
-  const response = await authenticatedFetch(url, apiKey);
+  const response = await authenticatedFetch(url);
   const user = await response.json();
   userProfileCache.set(userId, user);
   return user;
 };
 
-/**
- * Fetches a list of all recently sent emails using the modernized endpoint.
- */
 const getAllSentEmails = async (
-  apiKey: string,
   domain: string,
   limit: number,
 ): Promise<SentEmail[]> => {
   const baseUrl = `https://${domain}`;
   const url = `${baseUrl}/api/email-performance/emails?limit=${limit}`;
-  const response = await authenticatedFetch(url, apiKey);
+  const response = await authenticatedFetch(url);
   const result: SentEmailsApiResponse = await response.json();
 
   return (result.data || []).map((email) => ({
@@ -109,43 +99,20 @@ const getAllSentEmails = async (
   }));
 };
 
-/**
- * Provides a static list of dummy emails as a fallback.
- */
-export const getDummySentEmails = (): SentEmail[] => [
-  {
-    id: "dummy-email-1",
-    title: "Test Connection (FallBack)",
-    thumbnailUrl: null,
-    sentAt: new Date().toISOString(),
-    sender: { name: "System" },
-  },
-];
-
-/**
- * The primary public function for retrieving the list of sent emails.
- */
 export const getSentEmailsData = async (
-  apiKey: string,
   domain: string,
   limit: number,
 ): Promise<SentEmail[]> => {
-  if (!apiKey || domain.toLowerCase().includes("dummy"))
-    return getDummySentEmails();
+  if (domain.toLowerCase().includes("dummy")) return getDummySentEmails();
   try {
-    const emails = await getAllSentEmails(apiKey, domain, limit);
+    const emails = await getAllSentEmails(domain, limit);
     return emails.length > 0 ? emails : [];
   } catch (error) {
-    console.error("❗️ Failed to get sent emails list.", error);
     return getDummySentEmails();
   }
 };
 
-/**
- * Processes the raw event stream into recipient interactions.
- */
 const processEvents = async (
-  apiKey: string,
   domain: string,
   events: EmailEvent[],
 ): Promise<RecipientInteraction[]> => {
@@ -160,7 +127,7 @@ const processEvents = async (
   }
   const userProfiles = await Promise.all(
     Array.from(eventsByUser.keys()).map((id) =>
-      fetchUserProfile(apiKey, domain, id).catch(() => null),
+      fetchUserProfile(domain, id).catch(() => null),
     ),
   );
   const userProfileMap = new Map(
@@ -205,31 +172,35 @@ const processEvents = async (
   );
 };
 
+export const getDummySentEmails = (): SentEmail[] => [
+  {
+    id: "dummy1",
+    title: "Dummy Email",
+    thumbnailUrl: null,
+    sentAt: new Date().toISOString(),
+    sender: { name: "System" },
+  },
+];
+
 export const getDummyData = (): RecipientInteraction[] => [];
 
-/**
- * The primary public function for retrieving detailed analytics for a single email.
- */
 export const getEmailPerformanceData = async (
-  apiKey: string,
   emailId: string | undefined,
   domain: string,
   since: string,
   until: string,
 ): Promise<RecipientInteraction[]> => {
-  if (!apiKey || !emailId || emailId.toLowerCase().includes("dummy"))
+  if (!emailId || emailId.toLowerCase().includes("dummy"))
     return getDummyData();
   try {
     const events = await fetchAndParseEmailEvents(
-      apiKey,
       domain,
       emailId,
       since,
       until,
     );
-    return events.length > 0 ? processEvents(apiKey, domain, events) : [];
+    return events.length > 0 ? processEvents(domain, events) : [];
   } catch (error) {
-    console.error("❗️ Failed to get performance data.", error);
     return getDummyData();
   }
 };

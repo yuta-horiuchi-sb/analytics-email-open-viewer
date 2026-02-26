@@ -16,10 +16,6 @@ import { JSONSchema7 } from "json-schema";
 
 export const configurationSchema: JSONSchema7 = {
   properties: {
-    apikey: {
-      type: "string",
-      title: "Staffbase API Key",
-    },
     allemailsview: {
       type: "boolean",
       title: "All Emails View",
@@ -81,11 +77,6 @@ export const configurationSchema: JSONSchema7 = {
 };
 
 export const uiSchema: UiSchema = {
-  apikey: {
-    "ui:widget": "password",
-    "ui:help": "Enter your Administrative API Token (Studio Secret).",
-    "ui:placeholder": "Paste your secret here",
-  },
   allemailsview: {
     "ui:help":
       "If checked, displays a list of all sent emails. If unchecked, tracks a single email by its ID.",

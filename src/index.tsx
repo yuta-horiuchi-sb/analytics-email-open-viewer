@@ -27,7 +27,6 @@ import icon from "../resources/analytics-email-open-viewer.svg";
 import pkg from "../package.json";
 
 const widgetAttributes: string[] = [
-  "apikey",
   "emailid",
   "domain",
   "allemailsview",
