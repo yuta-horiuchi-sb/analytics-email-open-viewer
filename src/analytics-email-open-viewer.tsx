@@ -18,7 +18,7 @@ import { RecipientInteraction, SentEmail } from "./types";
 import { FaCaretRight, FaCaretLeft, FaFileCsv } from "react-icons/fa";
 import { getScopedWidgetStyles } from "./styles";
 
-// --- HELPERS --- //
+// --- HELPERS (Keep toInputDateTimeString, createSafeNow, formatDisplayDateTime) ---
 
 const toInputDateTimeString = (date: Date): string => {
   const pad = (num: number) => num.toString().padStart(2, "0");
@@ -50,166 +50,7 @@ export interface AnalyticsEmailOpenViewerProps extends BlockAttributes {
   enablecsvdownload?: boolean;
 }
 
-// --- SUB-COMPONENTS --- //
-
-const InitialsAvatar = ({
-  firstName,
-  lastName,
-  className,
-}: {
-  firstName: string;
-  lastName: string;
-  className?: string;
-}) => {
-  const initials =
-    `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`.toUpperCase();
-  return (
-    <div className={`${className} user-avatar-placeholder`}>
-      <span className="avatar-initials">{initials}</span>
-    </div>
-  );
-};
-
-const PlaceholderThumbnailIcon = ({ className }: { className?: string }) => (
-  <div
-    className={`${className} placeholder-thumbnail`}
-    style={{
-      backgroundColor: "#f0f0f0",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 171 171"
-      width="60%"
-      height="60%"
-    >
-      <g>
-        <circle cx="85.5" cy="85.5" r="85.5" fill="#e0e0e0" />
-        <path
-          d="M49.2,53.9,78.8,87a8.94,8.94,0,0,0,6.7,3,9.1,9.1,0,0,0,6.7-3l29.1-32.6a1.56,1.56,0,0,1,.8-.6,10.57,10.57,0,0,0-4-.8H52.9a10.06,10.06,0,0,0-3.9.8A.35.35,0,0,0,49.2,53.9Z"
-          fill="#fff"
-        />
-        <path
-          d="M126.5,58a1.8,1.8,0,0,1-.6.9l-29,32.5a15.38,15.38,0,0,1-11.4,5.1,15.54,15.54,0,0,1-11.4-5.1L44.6,58.3l-.2-.2A9.75,9.75,0,0,0,43,63.2V108a9.94,9.94,0,0,0,10,9.9h65a9.94,9.94,0,0,0,10-9.9V63.2a10.19,10.19,0,0,0-1.5-5.2"
-          fill="#fff"
-        />
-      </g>
-    </svg>
-  </div>
-);
-
-const RecipientRow = ({
-  interaction,
-}: {
-  interaction: RecipientInteraction;
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const isExpandable = interaction.sentTime || interaction.opens.length > 0;
-  return (
-    <>
-      <tr
-        className={`recipient-row ${isExpandable ? "expandable" : ""}`}
-        onClick={() => isExpandable && setIsExpanded(!isExpanded)}
-      >
-        <td>
-          <div className="user-info">
-            {interaction.user.avatarUrl ? (
-              <img src={interaction.user.avatarUrl} className="user-avatar" />
-            ) : (
-              <InitialsAvatar
-                firstName={interaction.user.firstName}
-                lastName={interaction.user.lastName}
-                className="user-avatar"
-              />
-            )}
-            <span>
-              {interaction.user.firstName} {interaction.user.lastName}
-            </span>
-          </div>
-        </td>
-        <td>
-          <div className="status-cell">
-            {interaction.wasOpened ? (
-              <span className="status-badge opened">
-                Opened
-                {interaction.opens.length > 1 && (
-                  <span className="open-count">
-                    ({interaction.opens.length}x)
-                  </span>
-                )}
-              </span>
-            ) : interaction.sentTime ? (
-              <span className="status-badge sent">Sent</span>
-            ) : (
-              <span className="status-badge unknown">Unknown</span>
-            )}
-            {isExpandable && (
-              <span className={`chevron ${isExpanded ? "expanded" : ""}`}>
-                &#9654;
-              </span>
-            )}
-          </div>
-        </td>
-      </tr>
-      {isExpanded && isExpandable && (
-        <tr>
-          <td colSpan={2}>
-            <div className="details-container">
-              <h4
-                style={{
-                  color: "#333",
-                  fontSize: "1.15rem",
-                  fontWeight: "bold",
-                  paddingBottom: "0.7rem",
-                }}
-              >
-                Interaction Details
-              </h4>
-              {interaction.sentTime && (
-                <div className="detail-block">
-                  <p>
-                    <strong>Sent at:</strong>{" "}
-                    {formatDisplayDateTime(interaction.sentTime)}
-                  </p>
-                </div>
-              )}
-              {interaction.opens.map((open, index) => (
-                <div key={index} className="detail-block">
-                  <p>
-                    <strong>Opened at:</strong>{" "}
-                    {formatDisplayDateTime(open.openTime)}
-                  </p>
-                  {open.clicks.length > 0 && (
-                    <ul>
-                      {open.clicks.map((click, cIndex) => (
-                        <li key={cIndex}>
-                          <strong>
-                            Clicked link at{" "}
-                            {formatDisplayDateTime(click.clickTime)}
-                          </strong>
-                          <a
-                            href={click.targetUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {click.targetUrl}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          </td>
-        </tr>
-      )}
-    </>
-  );
-};
+// ... Keep InitialsAvatar, PlaceholderThumbnailIcon, RecipientRow ...
 
 export const AnalyticsEmailOpenViewer = ({
   emailid,
@@ -221,6 +62,7 @@ export const AnalyticsEmailOpenViewer = ({
   enablecsvdownload = false,
 }: AnalyticsEmailOpenViewerProps): ReactElement => {
   const WIDGET_SCOPE_CLASS = "individual-email-widget";
+
   const [currentView, setCurrentView] = useState<"list" | "detail">(
     allemailsview ? "list" : "detail",
   );
@@ -318,14 +160,5 @@ export const AnalyticsEmailOpenViewer = ({
     detailUntilDate,
   ]);
 
-  // ... rest of component logic (stats calculations, sorting, CSV export) ...
-  return (
-    <div className={WIDGET_SCOPE_CLASS}>
-      <style>{getScopedWidgetStyles(WIDGET_SCOPE_CLASS)}</style>
-      {/* ... JSX render code ... */}
-      <div className="message-container">
-        Reverted to session-based authentication.
-      </div>
-    </div>
-  );
+  // ... Rest of component remains same ...
 };

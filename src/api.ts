@@ -22,7 +22,6 @@ import {
 
 /**
  * A reusable wrapper for the native `fetch` function.
- * This version relies on the existing browser session for authentication.
  */
 const authenticatedFetch = async (url: string) => {
   const response = await fetch(url, {
