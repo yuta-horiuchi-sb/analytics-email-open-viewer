@@ -20,34 +20,17 @@ import { getScopedWidgetStyles } from "./styles";
 
 // --- HELPERS --- //
 
-/**
- * Formats a Date object into a `YYYY-MM-DDTHH:mm` string, which is the required format
- * for `<input type="datetime-local">` elements.
- * @param date The date to format.
- * @returns A formatted string.
- */
 const toInputDateTimeString = (date: Date): string => {
   const pad = (num: number) => num.toString().padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
-/**
- * Creates a "now" date that is safely in the past (by 10 seconds). This prevents timing issues
- * where the client's request might be slightly ahead of the server's event logging, ensuring
- * that all recent events are included in the API query.
- * @returns A Date object set a few seconds in the past.
- */
 const createSafeNow = (): Date => {
   const now = new Date();
   now.setSeconds(now.getSeconds() - 10);
   return now;
 };
 
-/**
- * Formats an ISO date string into a human-readable local date and time format (e.g., "Oct 14, 2025, 10:01 AM").
- * @param isoString The ISO date string to format.
- * @returns A localized, readable date-time string.
- */
 const formatDisplayDateTime = (isoString: string): string => {
   return new Date(isoString).toLocaleString([], {
     dateStyle: "medium",
@@ -57,9 +40,6 @@ const formatDisplayDateTime = (isoString: string): string => {
 
 // --- COMPONENT PROPS --- //
 
-/**
- * Defines the configuration properties (props) that can be passed to the main component from the Staffbase platform.
- */
 export interface AnalyticsEmailOpenViewerProps extends BlockAttributes {
   emailid?: string;
   domain?: string;
@@ -72,9 +52,6 @@ export interface AnalyticsEmailOpenViewerProps extends BlockAttributes {
 
 // --- SUB-COMPONENTS --- //
 
-/**
- * Displays a user's initials in a circular container as a fallback when their profile picture is unavailable.
- */
 const InitialsAvatar = ({
   firstName,
   lastName,
@@ -93,9 +70,6 @@ const InitialsAvatar = ({
   );
 };
 
-/**
- * A placeholder SVG icon used when an email's thumbnail image is not available.
- */
 const PlaceholderThumbnailIcon = ({ className }: { className?: string }) => (
   <div
     className={`${className} placeholder-thumbnail`}
@@ -127,9 +101,6 @@ const PlaceholderThumbnailIcon = ({ className }: { className?: string }) => (
   </div>
 );
 
-/**
- * Renders a single row in the recipient performance table.
- */
 const RecipientRow = ({
   interaction,
 }: {
