@@ -61,7 +61,7 @@ const formatDisplayDateTime = (isoString: string): string => {
  * Defines the configuration properties (props) that can be passed to the main component from the Staffbase platform.
  */
 export interface AnalyticsEmailOpenViewerProps extends BlockAttributes {
-  apikey?: string; // Added apiKey to props
+  apikey?: string;
   emailid?: string;
   domain?: string;
   allemailsview?: boolean;
