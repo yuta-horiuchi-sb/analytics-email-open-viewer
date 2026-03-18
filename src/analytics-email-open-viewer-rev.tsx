@@ -425,14 +425,14 @@ export const AnalyticsEmailOpenViewer = ({
       "First Name",
       "Last Name",
       "User ID",
-      "Interaction Type",
-      "Interaction Time",
-      "Clicked URL",
       "Position",
       "Department",
       "Location",
       "Public Email Address",
       "Phone Number",
+      "Interaction Type",
+      "Interaction Time",
+      "Clicked URL",
     ];
     const csvRows = [headers.join(",")];
     for (const interaction of filteredRecipients) {
@@ -475,6 +475,7 @@ export const AnalyticsEmailOpenViewer = ({
           );
         }
       }
+      
     }
     const blob = new Blob([csvRows.join("\n")], {
       type: "text/csv;charset=utf-8;",
