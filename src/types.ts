@@ -36,6 +36,7 @@ export interface UserProfile {
   location: string | null; // Can be null if no location is set
   publicEmailAddress: string | null; // Can be null if no public email is set
   phoneNumber: string | null; // Can be null if no phone number is set
+  system_manager: string | null; // Can be null if no system manager is set
 }
 
 /**

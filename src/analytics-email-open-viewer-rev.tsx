@@ -430,6 +430,7 @@ export const AnalyticsEmailOpenViewer = ({
       "Location",
       "Public Email Address",
       "Phone Number",
+      "Manager",
       "Interaction Type",
       "Interaction Time",
       "Clicked URL",
@@ -445,6 +446,7 @@ export const AnalyticsEmailOpenViewer = ({
         escapeCsvField(interaction.user.location),
         escapeCsvField(interaction.user.publicEmailAddress),
         escapeCsvField(interaction.user.phoneNumber),
+        escapeCsvField(interaction.user.profile.system_manager)
       ];
       if (interaction.sentTime)
         csvRows.push(

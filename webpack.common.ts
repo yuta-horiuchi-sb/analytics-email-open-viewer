@@ -29,7 +29,7 @@ const config: webpack.Configuration = {
         use: [{ loader: "@svgr/webpack", options: { icon: true } }],
       },
       {
-        test: /analytics-email-open-viewer-rev\.svg$/,
+        test: /analytics-email-open-viewer\.svg$/,
         use: [
           {
             loader: "url-loader",
